@@ -1,0 +1,27 @@
+{
+    // ini hasil tabel nilai
+    "nama_mahasiswa": "1",
+    "kelas": "1",
+    "nama_matakuliah": "1",
+    "nilai": "85",
+    "nama_dosen": "1",
+    "mahasiswa" : [
+        "id_kelas" : "1",
+        "nama_mahasiswa" : "Farhan",
+        "kelas" : [
+            "id" : "1",
+            "nama_kelas" : "TIK",
+        ]
+    ]
+    "mata_kuliah" : [
+        "id" : "1",
+        "nama_matkul" : "IPA",
+        "id_dosen" : "1",
+        "kode_matkul" : "IPA-1",
+        "dosen" : [
+            "id" : "1",
+            "nama_dosen" : "Hanso",
+            "nip" : "123456789",
+        ]    
+    ]
+},
