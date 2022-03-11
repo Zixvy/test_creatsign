@@ -34,6 +34,29 @@ class Mahasiswa extends REST_Controller
             $mahasiswa = $this->Mahasiswa_model->get_mahasiswa($id);
         }
 
+        /**
+         * $mahasiswa = [
+         *  {
+         *      "id": 1213,
+         *      ...
+         *  },
+         *  {
+         *      ...
+         *  }
+         * ]
+         */
+        foreach ($mahasiswa as $mahasiswa_key => $mahasiswa_val) {
+            $id_kelas_arr = explode(",", $mahasiswa[$mahasiswa_key]["id_kelas"]); // "1,2,3" -> [1, 2, 3]
+            $kelas = [];
+            foreach ($id_kelas_arr as $id_kelas) {
+                // karena balikan dari model itu array dan datanya cuma satu dan PASTI satu,
+                // jadi bisa langsung diakses pake index objectnya.
+                $kelas_by_id = $this->Kelas_model->get_kelas($id_kelas)[0]; // [{ nama: "", id: "" }]
+                array_push($kelas, $kelas_by_id); // [{ nama: "", id: "" }, { nama: "", id: "" }]
+            }
+            $mahasiswa[$mahasiswa_key]["id_kelas"] = $kelas;
+        }
+
         if ($mahasiswa) {
             $this->response([
                 'status' => true,

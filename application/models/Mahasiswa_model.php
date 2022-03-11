@@ -31,7 +31,6 @@ class Mahasiswa_model extends CI_Model
 
     public function get_kelas_mahasiswa()
     {
-
         $this->db->select('id', 'nama_kelas')->get('kelas')->result_array();
         return $this->db->affected_rows();
     }

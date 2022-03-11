@@ -82,7 +82,7 @@ class Mata_kuliah extends REST_Controller
     {
         try {
             $this->form_validation->set_rules('nama_matakuliah', 'Nama Mata Kuliah', 'trim|required');
-            $this->form_validation->set_rules('kode_matakuliah', 'Kode Mata Kuliah', 'trim|required|numeric');
+            $this->form_validation->set_rules('kode_matakuliah', 'Kode Mata Kuliah', 'trim|required');
             $this->form_validation->set_rules('id_dosen', 'ID Dosen', 'trim|required|numeric');
 
             if (!$this->form_validation->run()) {
