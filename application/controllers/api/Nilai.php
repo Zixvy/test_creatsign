@@ -20,7 +20,10 @@ class Nilai extends REST_Controller
         $this->methods['index_put']['limit'] = 300;
 
         $this->load->model('Nilai_model');
-
+        $this->load->model('Mahasiswa_model');
+        $this->load->model('Dosen_model');
+        $this->load->model('Kelas_model');
+        $this->load->model('Mata_kuliah_model');
     }
 
     public function index_get()
@@ -28,7 +31,60 @@ class Nilai extends REST_Controller
         $id = $this->get('id');
 
         if ($id === null) {
+            $Kelas = $this->Kelas_model->get_kelas();
+            $Matkul = $this->Mata_kuliah_model->get_mata_kuliah();
+            $Dosen = $this->Dosen_model->get_dosen();
             $Nilai = $this->Nilai_model->get_nilai();
+
+            // get nilai by id_mahasiswa
+            foreach($Nilai as $key => $value) {
+                $Nilai[$key]['mahasiswa'] = $this->Mahasiswa_model->get_mahasiswa($value['nama_mahasiswa']);
+                $Nilai[$key]['mahasiswa']['kelas'] = $this->Kelas_model->get_kelas($value['kelas']);
+                $Nilai[$key]['mata_kuliah'] = $this->Mata_kuliah_model->get_mata_kuliah($value['nama_matakuliah']);
+                $Nilai[$key]['mata_kuliah']['dosen'] = $this->Dosen_model->get_dosen($value['nama_dosen']);
+                // foreach($Kelas as $key2 => $value2) {
+                //     if($value['kelas'] == $value2['id']) {
+                //         $Nilai[$key]['kelas'] = $this->Kelas_model->get_kelas($value['id']);
+                //     }
+                // }
+                //     foreach($Matkul as $key3 => $value3) {
+                //         if($value['nama_matakuliah'] == $value3['id']) {
+                //             $Matkul[$key]['nama_matakuliah'] = $this->Mata_kuliah_model->get_mata_kuliah($value['id']);
+                //         }
+                //         foreach($Dosen as $key4 => $value4) {
+                //             if($value['nama_dosen'] == $value4['id']) {
+                //                 $Dosen[$key]['dosen'] = $this->Dosen_model->get_dosen($value['id']);
+                //             }
+                //         }
+                //     }
+                // }
+
+                // merge all foreach into 1 array
+                // $Nilai[$key]['kelas'] = $Kelas;
+                // $Nilai[$key]['matkul'] = $Matkul;
+                // $Nilai[$key]['dosen'] = $Dosen;
+                
+                
+
+                // $Nilai[$key]['mata_kuliah'] = $this->Mata_kuliah_model->get_mata_kuliah($value['id']);
+                // $Nilai[$key]['dosen'] = $this->Dosen_model->get_dosen($value['id']);
+            }
+            // filter the data from nilai, mahasiswa, mata_kuliah, dosen, kelas
+            // $Nilai = array_map(function($Nilai) {
+            //     return [
+            //         'id' => $Nilai['id'],
+            //         'id_mahasiswa' => $Nilai['id_mahasiswa'],
+            //         'id_dosen' => $Nilai['id_dosen'],
+            //         'id_kelas' => $Nilai['id_kelas'],
+            //         'kode_matakuliah' => $Nilai['kode_matakuliah'],
+            //         'nilai' => $Nilai['nilai'],
+            //         'mahasiswa' => $Nilai['mahasiswa'],
+            //         'dosen' => $Nilai['dosen'],
+            //         'kelas' => $Nilai['kelas'],
+            //         'mata_kuliah' => $Nilai['mata_kuliah'],
+            //     ];
+            // }, $Nilai);
+
         } else {
             $Nilai = $this->Nilai_model->get_nilai($id);
         }
