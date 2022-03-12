@@ -6,9 +6,9 @@ class Dosen_model extends CI_Model
     public function get_dosen($id = null)
     {
         if ($id === null) {
-            return $this->db->get('dosen')->result_array();
+            return $this->db->order_by('nama_dosen', 'ASC')->get('dosen')->result_array();
         }
-        return $this->db->get_where('dosen', ['id' => $id])->result_array();
+        return $this->db->order_by('nama_dosen', 'ASC')->get_where('dosen', ['id' => $id])->result_array();
     }
 
     public function delete_dosen($id)

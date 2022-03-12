@@ -6,9 +6,9 @@ class Kelas_model extends CI_Model
     public function get_kelas($id = null)
     {
         if ($id === null) {
-            return $this->db->get('kelas')->result_array();
+            return $this->db->order_by('nama_kelas', 'ASC')->get('kelas')->result_array();
         }
-        return $this->db->get_where('kelas', ['id' => $id])->result_array();
+        return $this->db->order_by('nama_kelas', 'ASC')->get_where('kelas', ['id' => $id])->result_array();
     }
 
     public function delete_kelas($id)

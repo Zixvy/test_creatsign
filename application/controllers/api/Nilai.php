@@ -132,28 +132,39 @@ class Nilai extends REST_Controller
     public function index_put()
     {
         try {
-            $this->form_validation->set_rules('nama_matakuliah', 'Nama Nilai', 'trim|required');
-            $this->form_validation->set_rules('kode_matakuliah', 'Kode Nilai', 'trim|required|numeric');
-            $this->form_validation->set_rules('id_dosen', 'ID Dosen', 'trim|required|numeric');
-
+            $this->form_validation->set_data($this->put());
+            $this->form_validation->set_rules('nama_mahasiswa', 'Nama Mahasiswa', 'trim|required');
+            $this->form_validation->set_rules('kelas', 'Kelas', 'trim|required');
+            $this->form_validation->set_rules('nama_matakuliah', 'Nama Mata Kuliah', 'trim|required');
+            $this->form_validation->set_rules('nilai', 'Nilai', 'trim|required|numeric');
+            $this->form_validation->set_rules('nama_dosen', 'Nama Dosen', 'trim|required');
             if (!$this->form_validation->run()) {
                 throw new Exception(validation_errors());
             }
 
             $id = $this->put('id');
             $data = [
-                'nama_mahasiswa' => $this->post('nama_mahasiswa'),
-                'kelas' => $this->post('kelas'),
-                'nama_matakuliah' => $this->post('nama_matakuliah'),
-                'nilai' => $this->post('nilai'),
-                'nama_dosen' => $this->post('nama_dosen'),
+                'nama_mahasiswa' => $this->put('nama_mahasiswa'),
+                'kelas' => $this->put('kelas'),
+                'nama_matakuliah' => $this->put('nama_matakuliah'),
+                'nilai' => $this->put('nilai'),
+                'nama_dosen' => $this->put('nama_dosen'),
             ];
+            $nilai = $this->Nilai_model->get_nilai($id);
 
             if ($id === null) {
                 $this->response([
                     'status' => false,
                     'message' => 'Provide an ID',
                 ], REST_CONTROLLER::HTTP_BAD_REQUEST);
+            }
+
+            // if data doesnt change then return ok
+            if ($nilai[0]['nama_mahasiswa'] === $data['nama_mahasiswa'] && $nilai[0]['kelas'] === $data['kelas'] && $nilai[0]['nama_matakuliah'] === $data['nama_matakuliah'] && $nilai[0]['nilai'] === $data['nilai'] && $nilai[0]['nama_dosen'] === $data['nama_dosen']) {
+                $this->response([
+                    'status' => true,
+                    'message' => 'Nilai succesfully updated',
+                ], REST_CONTROLLER::HTTP_OK);
             }
 
             if ($this->Nilai_model->update_nilai($data, $id) > 0) {

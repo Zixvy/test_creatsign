@@ -106,6 +106,7 @@ class Kelas extends REST_Controller
     public function index_put()
     {
         try {
+            $this->form_validation->set_data($this->put());
             $this->form_validation->set_rules('nama_kelas', 'Nama Kelas', 'trim|required');
 
             if (!$this->form_validation->run()) {
@@ -114,14 +115,23 @@ class Kelas extends REST_Controller
 
             $id = $this->put('id');
             $data = [
-                'nama_kelas' => $this->post('nama_kelas'),
+                'nama_kelas' => $this->put('nama_kelas'),
             ];
+            $kelas = $this->Kelas_model->get_kelas($id);
 
             if ($id === null) {
                 $this->response([
                     'status' => false,
                     'message' => 'Provide an ID',
                 ], REST_CONTROLLER::HTTP_BAD_REQUEST);
+            }
+
+            // if data doesnt change then return ok
+            if ($kelas[0]['nama_kelas'] === $data['nama_kelas']) {
+                $this->response([
+                    'status' => true,
+                    'message' => 'kelas succesfully updated',
+                ], REST_CONTROLLER::HTTP_OK);
             }
 
             if ($this->Kelas_model->update_kelas($data, $id) > 0) {

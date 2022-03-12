@@ -45,17 +45,17 @@ class Mahasiswa extends REST_Controller
          *  }
          * ]
          */
-        foreach ($mahasiswa as $mahasiswa_key => $mahasiswa_val) {
-            $id_kelas_arr = explode(",", $mahasiswa[$mahasiswa_key]["id_kelas"]); // "1,2,3" -> [1, 2, 3]
-            $kelas = [];
-            foreach ($id_kelas_arr as $id_kelas) {
-                // karena balikan dari model itu array dan datanya cuma satu dan PASTI satu,
-                // jadi bisa langsung diakses pake index objectnya.
-                $kelas_by_id = $this->Kelas_model->get_kelas($id_kelas)[0]; // [{ nama: "", id: "" }]
-                array_push($kelas, $kelas_by_id); // [{ nama: "", id: "" }, { nama: "", id: "" }]
-            }
-            $mahasiswa[$mahasiswa_key]["id_kelas"] = $kelas;
-        }
+        // foreach ($mahasiswa as $mahasiswa_key => $mahasiswa_val) {
+        // $id_kelas_arr = explode(",", $mahasiswa[$mahasiswa_key]["id_kelas"]); // "1,2,3" -> [1, 2, 3]
+        // $kelas = [];
+        // foreach ($id_kelas_arr as $id_kelas) {
+        // karena balikan dari model itu array dan datanya cuma satu dan PASTI satu,
+        // jadi bisa langsung diakses pake index objectnya.
+        // $kelas_by_id = $this->Kelas_model->get_kelas($id_kelas)[0]; // [{ nama: "", id: "" }]
+        // array_push($kelas, $kelas_by_id); // [{ nama: "", id: "" }, { nama: "", id: "" }]
+        //     }
+        //     $mahasiswa[$mahasiswa_key]["id_kelas"] = $kelas;
+        // }
 
         if ($mahasiswa) {
             $this->response([
@@ -145,11 +145,12 @@ class Mahasiswa extends REST_Controller
     public function index_put()
     {
         try {
+            $this->form_validation->set_data($this->put());
             $this->form_validation->set_rules('nama', 'Nama', 'trim|required');
-            $this->form_validation->set_rules('no_telp', 'No Telp', 'trim|required|is_unique[mahasiswa.no_telp]|numeric|max_length[12]');
+            $this->form_validation->set_rules('no_telp', 'No Telp', 'trim|required|numeric|max_length[12]');
             $this->form_validation->set_rules('id_kelas', 'ID Kelas', 'trim|required|numeric');
             $this->form_validation->set_rules('alamat', 'Alamat', 'trim|required');
-            $this->form_validation->set_rules('nim', 'NIM', 'trim|required|numeric|is_unique[mahasiswa.nim]|max_length[10]');
+            $this->form_validation->set_rules('nim', 'NIM', 'trim|required|numeric|max_length[10]');
 
             if (!$this->form_validation->run()) {
                 throw new Exception(validation_errors());
@@ -157,29 +158,38 @@ class Mahasiswa extends REST_Controller
 
             $id = $this->put('id');
             $data = [
-                'nim' => $this->post('nim'),
-                'nama' => $this->post('nama'),
-                'alamat' => $this->post('alamat'),
-                'no_telp' => $this->post('no_telp'),
-                'id_kelas' => $this->post('id_kelas'),
+                'nim' => $this->put('nim'),
+                'nama' => $this->put('nama'),
+                'alamat' => $this->put('alamat'),
+                'no_telp' => $this->put('no_telp'),
+                'id_kelas' => $this->put('id_kelas'),
             ];
+            $mahasiswa = $this->Mahasiswa_model->get_mahasiswa($id);
 
             if ($id === null) {
                 $this->response([
                     'status' => false,
-                    'message' => 'Provide an ID',
+                    'message' => 'Tolong sediakan ID',
                 ], REST_CONTROLLER::HTTP_BAD_REQUEST);
+            }
+
+            // if data doesnt change then do nothing
+            if ($mahasiswa[0]['nim'] === $data['nim'] && $mahasiswa[0]['nama'] === $data['nama'] && $mahasiswa[0]['alamat'] === $data['alamat'] && $mahasiswa[0]['no_telp'] === $data['no_telp'] && $mahasiswa[0]['id_kelas'] === $data['id_kelas']) {
+                $this->response([
+                    'status' => false,
+                    'message' => 'Berhasil update mahasiswa',
+                ], REST_CONTROLLER::HTTP_OK);
             }
 
             if ($this->Mahasiswa_model->update_mahasiswa($data, $id) > 0) {
                 $this->response([
                     'status' => true,
-                    'message' => 'Mahasiswa succesfully updated',
+                    'message' => 'Berhasil update mahasiswa',
                 ], REST_CONTROLLER::HTTP_OK);
             } else {
                 $this->response([
                     'status' => false,
-                    'message' => 'Failed to update data',
+                    'message' => 'Gagal update mahasiswa',
                 ], REST_CONTROLLER::HTTP_BAD_REQUEST);
             }
         } catch (\Throwable $e) {

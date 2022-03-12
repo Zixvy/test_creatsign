@@ -119,10 +119,11 @@ class Dosen extends REST_Controller
     public function index_put()
     {
         try {
+            $this->form_validation->set_data($this->put());
             $this->form_validation->set_rules('nama_dosen', 'Nama Dosen', 'trim|required');
-            $this->form_validation->set_rules('no_telp', 'No Telp', 'trim|required|is_unique[dosen.no_telp]|numeric|max_length[12]');
+            $this->form_validation->set_rules('no_telp', 'No Telp', 'trim|required|numeric|max_length[12]');
             $this->form_validation->set_rules('alamat', 'Alamat', 'trim|required');
-            $this->form_validation->set_rules('nip', 'NIP', 'trim|required|numeric|is_unique[dosen.nip]|max_length[10]');
+            $this->form_validation->set_rules('nip', 'NIP', 'trim|required|numeric|max_length[10]');
 
             if (!$this->form_validation->run()) {
                 throw new Exception(validation_errors());
@@ -130,11 +131,20 @@ class Dosen extends REST_Controller
 
             $id = $this->put('id');
             $data = [
-                'nip' => $this->post('nip'),
-                'nama_dosen' => $this->post('nama_dosen'),
-                'alamat' => $this->post('alamat'),
-                'no_telp' => $this->post('no_telp'),
+                'nip' => $this->put('nip'),
+                'nama_dosen' => $this->put('nama_dosen'),
+                'alamat' => $this->put('alamat'),
+                'no_telp' => $this->put('no_telp'),
             ];
+            $dosen = $this->Dosen_model->get_dosen($id);
+
+            // if data doesnt change then return ok
+            if ($dosen[0]['nip'] == $data['nip'] && $dosen[0]['nama_dosen'] == $data['nama_dosen'] && $dosen[0]['alamat'] == $data['alamat'] && $dosen[0]['no_telp'] == $data['no_telp']) {
+                $this->response([
+                    'status' => true,
+                    'message' => 'Dosen succesfully updated',
+                ], REST_CONTROLLER::HTTP_OK);
+            }
 
             if ($id === null) {
                 $this->response([
@@ -146,7 +156,7 @@ class Dosen extends REST_Controller
             if ($this->Dosen_model->update_dosen($data, $id) > 0) {
                 $this->response([
                     'status' => true,
-                    'message' => 'dosen succesfully updated',
+                    'message' => 'Dosen succesfully updated',
                 ], REST_CONTROLLER::HTTP_OK);
             } else {
                 $this->response([

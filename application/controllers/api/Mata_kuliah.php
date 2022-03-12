@@ -40,16 +40,9 @@ class Mata_kuliah extends REST_Controller
             ], REST_CONTROLLER::HTTP_OK);
         }
 
-        if ($mata_kuliah === null) {
-            $this->response([
-                'status' => false,
-                'message' => 'Mata Kuliah not found',
-            ], REST_CONTROLLER::HTTP_NOT_FOUND);
-        }
-
         $this->response([
             'status' => false,
-            'message' => 'User not found',
+            'message' => 'Mata Kuliah not found',
         ], REST_CONTROLLER::HTTP_NOT_FOUND);
     }
 
@@ -61,12 +54,12 @@ class Mata_kuliah extends REST_Controller
             $this->response([
                 'status' => false,
                 'message' => 'Provide an ID',
+                'id' => $id,
             ], REST_CONTROLLER::HTTP_BAD_REQUEST);
         } else {
             if ($this->Mata_kuliah_model->delete_mata_kuliah($id) > 0) {
                 $this->response([
                     'status' => false,
-                    'id' => $id,
                     'message' => 'Deleted',
                 ], REST_CONTROLLER::HTTP_OK);
             } else {
@@ -117,8 +110,9 @@ class Mata_kuliah extends REST_Controller
     public function index_put()
     {
         try {
+            $this->form_validation->set_data($this->put());
             $this->form_validation->set_rules('nama_matakuliah', 'Nama Mata Kuliah', 'trim|required');
-            $this->form_validation->set_rules('kode_matakuliah', 'Kode Mata Kuliah', 'trim|required|numeric');
+            $this->form_validation->set_rules('kode_matakuliah', 'Kode Mata Kuliah', 'trim|required');
             $this->form_validation->set_rules('id_dosen', 'ID Dosen', 'trim|required|numeric');
 
             if (!$this->form_validation->run()) {
@@ -126,10 +120,12 @@ class Mata_kuliah extends REST_Controller
             }
 
             $id = $this->put('id');
+            $kode_matakuliah = $this->put('kode_matakuliah');
+            $mata_kuliah = $this->Mata_kuliah_model->get_mata_kuliah($kode_matakuliah);
             $data = [
-                'nama_matakuliah' => $this->post('nama_matakuliah'),
-                'kode_matakuliah' => $this->post('kode_matakuliah'),
-                'id_dosen' => $this->post('id_dosen'),
+                'nama_matakuliah' => $this->put('nama_matakuliah'),
+                'kode_matakuliah' => $this->put('kode_matakuliah'),
+                'id_dosen' => $this->put('id_dosen'),
             ];
 
             if ($id === null) {
@@ -137,6 +133,14 @@ class Mata_kuliah extends REST_Controller
                     'status' => false,
                     'message' => 'Provide an ID',
                 ], REST_CONTROLLER::HTTP_BAD_REQUEST);
+            }
+
+            // if data doesnt change then do nothing
+            if ($mata_kuliah[0]['nama_matakuliah'] == $data['nama_matakuliah'] && $mata_kuliah[0]['kode_matakuliah'] == $data['kode_matakuliah'] && $mata_kuliah[0]['id_dosen'] == $data['id_dosen']) {
+                $this->response([
+                    'status' => true,
+                    'message' => 'Mata Kuliah succesfully updated',
+                ], REST_CONTROLLER::HTTP_OK);
             }
 
             if ($this->Mata_kuliah_model->update_mata_kuliah($data, $id) > 0) {

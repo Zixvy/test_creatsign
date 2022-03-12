@@ -6,12 +6,12 @@ class Nilai_model extends CI_Model
     public function get_nilai($id = null)
     {
         if ($id === null) {
-            return $this->db->get('nilai')->result_array();
+            return $this->db->order_by('id', 'DESC')->get('nilai')->result_array();
         }
-        return $this->db->get_where('nilai', ['id' => $id])->result_array();
+        return $this->db->order_by('id', 'DESC')->get_where('nilai', ['id' => $id])->result_array();
     }
 
-    public function get_view_nilai() 
+    public function get_view_nilai()
     {
         $this->db->select('mahasiswa.nama, kelas.nama_kelas, mata_kuliah.nama_matakuliah, nilai.nilai, dosen.nama_dosen');
         $this->db->from('nilai');
@@ -39,7 +39,4 @@ class Nilai_model extends CI_Model
         $this->db->update('nilai', $data, ['id' => $id]);
         return $this->db->affected_rows();
     }
-
-   
-
 }
